@@ -1,7 +1,19 @@
+import os
 import time
+from flask import Flask
 from telegram import Update, ChatAction
 from telegram.ext import ApplicationBuilder, CommandHandler
+import threading
 
+# Initialize Flask for port binding
+app = Flask(__name__)
+
+# Flask route to keep Render happy by binding to port
+@app.route('/')
+def index():
+    return "Bot is running!"
+
+# Telegram bot functionality
 TOKEN = '7714661974:AAE5jUkm9M9deeBTzsABuo0JkPMJpjVxnA4'
 
 async def start(update: Update, context):
@@ -21,10 +33,24 @@ async def start(update: Update, context):
 async def error_handler(update, context):
     print(f'Update {update} caused error {context.error}')
 
-if __name__ == '__main__':
+def run_telegram_bot():
+    # Initialize the bot
     app = ApplicationBuilder().token(TOKEN).build()
 
+    # Add /start handler
     app.add_handler(CommandHandler("start", start))
 
+    # Start polling for Telegram updates
     app.run_polling()
-                                       
+
+if __name__ == '__main__':
+    # Run Telegram bot in a separate thread
+    bot_thread = threading.Thread(target=run_telegram_bot)
+    bot_thread.start()
+
+    # Get the port from the environment variable, default to 8080
+    port = int(os.getenv('PORT', 8080))
+
+    # Start Flask app on the specified port
+    app.run(host='0.0.0.0', port=port)
+    
