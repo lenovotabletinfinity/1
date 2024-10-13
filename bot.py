@@ -1,7 +1,8 @@
 import os
 import time
 from flask import Flask
-from telegram import Update, ChatAction
+from telegram import Update
+from telegram.constants import ChatAction  # Use the updated import path
 from telegram.ext import ApplicationBuilder, CommandHandler
 import threading
 
