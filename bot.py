@@ -1,12 +1,17 @@
-import logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 import os
 import time
+import logging
 from flask import Flask
 from telegram import Update
-from telegram.constants import ChatAction  # Use the updated import path
+from telegram.constants import ChatAction
 from telegram.ext import ApplicationBuilder, CommandHandler
 import threading
+
+# Enable logging to track events
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 # Initialize Flask for port binding
 app = Flask(__name__)
@@ -17,9 +22,11 @@ def index():
     return "Bot is running!"
 
 # Telegram bot functionality
-TOKEN = '7714661974:AAE5jUkm9M9deeBTzsABuo0JkPMJpjVxnA4'
+TOKEN = os.getenv('7714661974:AAE5jUkm9M9deeBTzsABuo0JkPMJpjVxnA4')  # Read token from environment variable
 
 async def start(update: Update, context):
+    logger.info("Received /start command")  # Log the command reception
+
     # React with 🔥 by simulating a typing action for 2 seconds
     await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
     time.sleep(2)  # Simulate typing time to represent the "reaction"
@@ -32,9 +39,10 @@ async def start(update: Update, context):
 
     # Delete the sticker
     await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=sticker_message.message_id)
+    logger.info("Sticker sent and deleted successfully")  # Log sticker sent and deleted
 
 async def error_handler(update, context):
-    print(f'Update {update} caused error {context.error}')
+    logger.error(f'Update {update} caused error {context.error}')  # Log errors
 
 def run_telegram_bot():
     # Initialize the bot
@@ -43,7 +51,11 @@ def run_telegram_bot():
     # Add /start handler
     app.add_handler(CommandHandler("start", start))
 
+    # Set up the error handler
+    app.add_error_handler(error_handler)
+
     # Start polling for Telegram updates
+    logger.info("Starting the bot in polling mode")
     app.run_polling()
 
 if __name__ == '__main__':
