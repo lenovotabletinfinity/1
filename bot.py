@@ -1,10 +1,11 @@
-from telegram import Update, Sticker
+import os
+from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 import time
 import threading
 
-# Your bot's token
-TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+# Load the bot's token from an environment variable
+TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 def start(update: Update, context: CallbackContext) -> None:
     # React to the /start command
