@@ -1,66 +1,32 @@
-import os
-import asyncio  # Add asyncio
 from telegram import Update, Sticker
-from telegram.ext import ApplicationBuilder, CommandHandler
-from flask import Flask
-import threading
+from telegram.ext import Updater, CommandHandler, CallbackContext
 import time
+import threading
 
-# Load the bot token from environment variable
-TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+# Your bot's token
+TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
 
-# Debugging: Check if the token is loaded
-if TOKEN:
-    print(f"Bot token loaded: {TOKEN[:5]}...")  # Print first five characters for safety
-else:
-    print("Failed to load TELEGRAM_BOT_TOKEN from environment variables")
-    exit(1)  # Exit the program if no token is found
+def start(update: Update, context: CallbackContext) -> None:
+    # React to the /start command
+    context.bot.send_chat_action(chat_id=update.effective_chat.id, action='typing')
+    context.bot.send_sticker(chat_id=update.effective_chat.id, sticker='CAACAgUAAxkBAAIg0mcLMMWYOB-RqDzBRsGYmg4nDLtTAAIEAAPBJDExieUdbguzyBAeBA')
 
-# Initialize the Flask app
-app = Flask(__name__)
+    # Schedule sticker deletion
+    threading.Timer(2, delete_sticker, [update.effective_chat.id, context]).start()
 
-# Function to handle the /start command
-async def start(update: Update, context):
-    try:
-        # React with 🔥
-        print("Received /start command")
-        await update.message.chat.send_action("typing")  # Simulate typing action
+def delete_sticker(chat_id, context):
+    context.bot.delete_message(chat_id=chat_id)
 
-        # Send sticker
-        sticker_id = "CAACAgUAAxkBAAIg0mcLMMWYOB-RqDzBRsGYmg4nDLtTAAIEAAPBJDExieUdbguzyBAeBA"
-        sticker_message = await update.message.reply_sticker(sticker_id)
-        print("Sticker sent")
+def main() -> None:
+    updater = Updater(TOKEN)
 
-        # Wait 2 seconds and delete the sticker
-        time.sleep(2)
-        await sticker_message.delete()
-        print("Sticker deleted")
-    except Exception as e:
-        print(f"Error in start command: {e}")
+    # Register the /start command handler
+    updater.dispatcher.add_handler(CommandHandler('start', start))
 
-# Function to run the Telegram bot using asyncio.run()
-async def run_telegram_bot():
-    application = ApplicationBuilder().token(TOKEN).build()
+    # Start the Bot
+    updater.start_polling()
+    updater.idle()
 
-    # Add a handler for the /start command
-    application.add_handler(CommandHandler("start", start))
-
-    # Run the bot using asyncio
-    await application.run_polling()
-
-# Start the Flask server
-@app.route('/')
-def home():
-    return "Bot is running!"
-
-# Function to start the bot in a thread
-def start_bot_thread():
-    asyncio.run(run_telegram_bot())  # Use asyncio.run to ensure the event loop is properly set up
-
-# Run the Telegram bot in a separate thread
-if __name__ == "__main__":
-    bot_thread = threading.Thread(target=start_bot_thread)
-    bot_thread.start()
-
-    # Start the Flask app
-    app.run(host="0.0.0.0", port=8080)
+if __name__ == '__main__':
+    main()
+    
