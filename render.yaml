@@ -6,5 +6,5 @@ services:
     startCommand: "python bot.py"
     envVars:
       - key: TELEGRAM_BOT_TOKEN
-        fromService: my-telegram-bot
+        value: YOUR_TELEGRAM_BOT_TOKEN
         
