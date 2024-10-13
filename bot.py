@@ -22,7 +22,7 @@ def index():
     return "Bot is running!"
 
 # Telegram bot functionality
-TOKEN = os.getenv('7714661974:AAE5jUkm9M9deeBTzsABuo0JkPMJpjVxnA4')  # Read token from environment variable
+TOKEN = os.getenv('7714661974:AAFhvX58ETASCDPw-EmP-UMp_2NMFUJGRz0')  # Read token from environment variable
 
 async def start(update: Update, context):
     logger.info("Received /start command")  # Log the command reception
