@@ -1,1 +1,1 @@
-python-telegram-bot[webhooks]==20.3
+aiogram==2.25.1  # Python Telegram Bot API library
