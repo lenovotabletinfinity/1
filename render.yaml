@@ -1,10 +1,21 @@
 services:
   - type: web
-    name: my-telegram-bot
+    name: telegram-bot
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python bot.py"
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
     envVars:
-      - key: TELEGRAM_BOT_TOKEN
-        value: YOUR_TELEGRAM_BOT_TOKEN
+      - key: TOKEN
+        fromSecret: telegram-bot-token
+      - key: WEBHOOK_URL
+        fromSecret: telegram-bot-webhook-url
+      - key: API_ID
+        fromSecret: telegram-bot-api-id     # Add API ID
+      - key: API_HASH
+        fromSecret: telegram-bot-api-hash   # Add API Hash
+      - key: USE_WEBHOOK
+        value: "True"
+      - key: PORT
+        value: "8080"
         
