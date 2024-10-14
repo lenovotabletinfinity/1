@@ -39,9 +39,10 @@ async def start_command(message: types.Message):
     user_first_name = message.from_user.first_name  # Get the user's first name
     bot_username = (await bot.me).username          # Get the bot's username
 
-    caption_text = f"""<b><blockquote>Hᴇʟʟᴏ {user_first_name}, ᴍʏsᴇʟғ <a href="https://t.me/{bot_username}">{bot_username}</a></blockquote>
+    caption_text = f"""<b><blockquote>Hᴇʟʟᴏ {user_first_name}, ᴍʏsᴇʟғ <a href="https://t.me/{bot_username}">{bot_username}</a></blockquote></b>
 
 Wᴀɴᴛ ᴛᴏ ᴡᴀᴛᴄʜ Aɴɪᴍᴇ? I ᴄᴀɴ ᴘʀᴏᴠɪᴅᴇ ᴀɴʏ Aɴɪᴍᴇ ʏᴏᴜ ᴡᴀɴᴛ."""
+   
 
     # Inline button
     keyboard = InlineKeyboardMarkup()
