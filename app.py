@@ -101,7 +101,7 @@ async def show_about_me(callback_query: types.CallbackQuery):
         # Wait for 1 second before showing the final about me text
         await asyncio.sleep(1)
 
-        # Final About Me details
+        # Final About Me details with "🔙 Bᴀᴄᴋ" button
         bot_username = (await bot.me).username
         about_me_caption = f"""<b><blockquote>⍟───[ MY ᴅᴇᴛᴀɪʟꜱ ]───⍟</blockquote>
         
@@ -114,17 +114,72 @@ async def show_about_me(callback_query: types.CallbackQuery):
 ‣ ʙᴏᴛ sᴇʀᴠᴇʀ : <a href='https://render.com'>Rᴇɴᴅᴇʀ</a>
 ‣ ʙᴜɪʟᴅ sᴛᴀᴛᴜs : ᴠ2.7.1 [sᴛᴀʙʟᴇ]</b>"""
 
-        # Update the caption with the final about me details
+        # Add the "🔙 Bᴀᴄᴋ" button
+        keyboard = InlineKeyboardMarkup()
+        back_button = InlineKeyboardButton(text="🔙 Bᴀᴄᴋ", callback_data="back_to_start")
+        keyboard.add(back_button)
+
+        # Update the caption with the final about me details and the "🔙 Bᴀᴄᴋ" button
         await bot.edit_message_caption(
             chat_id=callback_query.message.chat.id,
             message_id=callback_query.message.message_id,
             caption=about_me_caption,
-            parse_mode="HTML"
+            parse_mode="HTML",
+            reply_markup=keyboard  # Attach the back button
         )
 
     except Exception as e:
         print(f"Error handling about_me callback: {e}")
         # Optionally, send a message if something went wrong
+        await bot.send_message(
+            chat_id=callback_query.message.chat.id,
+            text="Sorry, something went wrong while handling your request."
+        )
+
+
+# Callback handler for the "🔙 Bᴀᴄᴋ" button
+@dp.callback_query_handler(lambda callback_query: callback_query.data == "back_to_start")
+async def back_to_start(callback_query: types.CallbackQuery):
+    try:
+        # First loading animation step
+        loading_step_1 = "▣☐☐"
+        await bot.edit_message_caption(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            caption=loading_step_1
+        )
+        await bot.answer_callback_query(callback_query.id)
+
+        # Wait for 1 second
+        await asyncio.sleep(1)
+
+        # Second loading animation step
+        loading_step_2 = "☐▣☐"
+        await bot.edit_message_caption(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            caption=loading_step_2
+        )
+
+        # Wait for 1 second
+        await asyncio.sleep(1)
+
+        # Third loading animation step
+        loading_step_3 = "☐☐▣"
+        await bot.edit_message_caption(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            caption=loading_step_3
+        )
+
+        # Wait for 1 second before going back to the start message
+        await asyncio.sleep(1)
+
+        # Send the start message again
+        await start_command(callback_query.message)  # Call the start command to resend the initial message
+
+    except Exception as e:
+        print(f"Error handling back_to_start callback: {e}")
         await bot.send_message(
             chat_id=callback_query.message.chat.id,
             text="Sorry, something went wrong while handling your request."
