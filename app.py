@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.executor import start_webhook
 
-# Load environment variables
+# Load environment variables (API_ID, API_HASH, TOKEN, WEBHOOK_URL)
 API_ID = os.getenv("API_ID")          # API ID from environment
 API_HASH = os.getenv("API_HASH")      # API Hash from environment
 API_TOKEN = os.getenv("TOKEN")        # Bot token from environment
@@ -22,9 +22,10 @@ WEBHOOK_URL_FULL = f"{WEBHOOK_URL}{WEBHOOK_PATH}"
 # Webhook mode or polling mode
 USE_WEBHOOK = os.getenv("USE_WEBHOOK", "True").lower() == "true"
 
+
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
-    # React with typing action (this will simulate an interaction)
+    # React with typing action
     await bot.send_chat_action(message.chat.id, action="typing")
 
     # Send the sticker
@@ -39,25 +40,67 @@ async def start_command(message: types.Message):
     user_first_name = message.from_user.first_name  # Get the user's first name
     bot_username = (await bot.me).username          # Get the bot's username
 
+    # Caption text for the image
     caption_text = f"""<b><blockquote>Hᴇʟʟᴏ {user_first_name}, ᴍʏsᴇʟғ <a href="https://t.me/{bot_username}">{bot_username}</a></blockquote></b>
 
 Wᴀɴᴛ ᴛᴏ ᴡᴀᴛᴄʜ Aɴɪᴍᴇ? I ᴄᴀɴ ᴘʀᴏᴠɪᴅᴇ ᴀɴʏ Aɴɪᴍᴇ ʏᴏᴜ ᴡᴀɴᴛ."""
-   
 
-    # Inline button
+    # Inline buttons
     keyboard = InlineKeyboardMarkup()
-    button = InlineKeyboardButton(text="✭ Aɴɪᴍᴇ Cʜᴀɴɴᴇʟ ✭", url="https://t.me/Cartoon_Carnival")
-    keyboard.add(button)
+    button_anime_channel = InlineKeyboardButton(text="✭ Aɴɪᴍᴇ Cʜᴀɴɴᴇʟ ✭", url="https://t.me/Cartoon_Carnival")
+    button_about_me = InlineKeyboardButton(text="❀ Aʙᴏᴜᴛ Mᴇ ❀", callback_data="about_me")
+    keyboard.add(button_anime_channel)
+    keyboard.add(button_about_me)
 
-    # Send the image with the caption and the button
-    image_url = "https://files.catbox.moe/ido2f5.jpg"
+    # Send the image with the caption and buttons
+    image_url = "https://files.catbox.moe/w34293.jpg"
     await bot.send_photo(
         chat_id=message.chat.id,
         photo=image_url,
         caption=caption_text,
-        parse_mode="HTML",  # To enable HTML formatting in the caption
-        reply_markup=keyboard  # Attach the inline button
+        parse_mode="HTML",
+        reply_markup=keyboard  # Attach inline buttons
     )
+
+
+# Callback handler for the "❀ Aʙᴏᴜᴛ Mᴇ ❀" button
+@dp.callback_query_handler(lambda callback_query: callback_query.data == "about_me")
+async def show_about_me(callback_query: types.CallbackQuery):
+    # Show the loading animation
+    loading_animation = "▣☐☐\n☐▣☐\n☐☐▣"
+    await bot.edit_message_caption(
+        chat_id=callback_query.message.chat.id,
+        message_id=callback_query.message.message_id,
+        caption=loading_animation
+    )
+
+    # Simulate loading delay
+    await asyncio.sleep(3)
+
+    # Edit the message with the details
+    bot_username = (await bot.me).username
+    about_me_caption = f"""<b><blockquote>⍟───[ MY ᴅᴇᴛᴀɪʟꜱ ]───⍟</blockquote>
+    
+‣ ᴍʏ ɴᴀᴍᴇ : <a href="https://t.me/{bot_username}">{bot_username}</a>
+‣ ᴍʏ ʙᴇsᴛ ғʀɪᴇɴᴅ : <a href='tg://settings'>ᴛʜɪs ᴘᴇʀsᴏɴ</a>
+‣ ᴅᴇᴠᴇʟᴏᴘᴇʀ  : <a href='https://t.me/Nobita_MUI'>Nᴏʙɪᴛᴀ</a>
+‣ ʟɪʙʀᴀʀʏ : <a href='https://docs.pyrogram.org/'>ᴘʏʀᴏɢʀᴀᴍ</a>
+‣ ʟᴀɴɢᴜᴀɢᴇ : <a href='https://www.python.org/download/releases/3.0/'>ᴘʏᴛʜᴏɴ 3</a>
+‣ ᴅᴀᴛᴀ ʙᴀsᴇ : <a href='https://www.mongodb.com/'>ᴍᴏɴɢᴏ ᴅʙ</a>
+‣ ʙᴏᴛ sᴇʀᴠᴇʀ : <a href='https://render.com'>Rᴇɴᴅᴇʀ</a>
+‣ ʙᴜɪʟᴅ sᴛᴀᴛᴜs : ᴠ2.7.1 [sᴛᴀʙʟᴇ]</b>"""
+
+    # Update the caption with details
+    await bot.edit_message_caption(
+        chat_id=callback_query.message.chat.id,
+        message_id=callback_query.message.message_id,
+        caption=about_me_caption,
+        parse_mode="HTML"
+    )
+
+    # Acknowledge the callback query
+    await bot.answer_callback_query(callback_query.id)
+
 
 # Startup and shutdown actions
 async def on_startup(dp):
@@ -66,10 +109,12 @@ async def on_startup(dp):
     else:
         await bot.delete_webhook()
 
+
 async def on_shutdown(dp):
     if USE_WEBHOOK:
         await bot.delete_webhook()
     await bot.close()
+
 
 # Main entry point for webhook or polling
 if __name__ == '__main__':
@@ -79,8 +124,8 @@ if __name__ == '__main__':
             webhook_path=WEBHOOK_PATH,
             on_startup=on_startup,
             on_shutdown=on_shutdown,
-            host="0.0.0.0",  # Render binds to 0.0.0.0
-            port=PORT,  # Explicitly bind to port 8080
+            host="0.0.0.0",  # Bind to 0.0.0.0 for Render
+            port=PORT,       # Use the port from the environment
         )
     else:
         from aiogram import executor
