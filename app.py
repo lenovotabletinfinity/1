@@ -22,6 +22,7 @@ WEBHOOK_URL_FULL = f"{WEBHOOK_URL}{WEBHOOK_PATH}"
 # Webhook mode or polling mode
 USE_WEBHOOK = os.getenv("USE_WEBHOOK", "True").lower() == "true"
 
+
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
     # React with typing action
@@ -66,21 +67,41 @@ Wᴀɴᴛ ᴛᴏ ᴡᴀᴛᴄʜ Aɴɪᴍᴇ? I ᴄᴀɴ ᴘʀᴏᴠɪᴅᴇ ᴀ�
 @dp.callback_query_handler(lambda callback_query: callback_query.data == "about_me")
 async def show_about_me(callback_query: types.CallbackQuery):
     try:
-        # Show the loading animation
-        loading_animation = "▣☐☐\n☐▣☐\n☐☐▣"
+        # First loading animation step
+        loading_step_1 = "▣☐☐"
         await bot.edit_message_caption(
             chat_id=callback_query.message.chat.id,
             message_id=callback_query.message.message_id,
-            caption=loading_animation
+            caption=loading_step_1
+        )
+        await bot.answer_callback_query(callback_query.id)  # Acknowledge the callback
+
+        # Wait for 1 second
+        await asyncio.sleep(1)
+
+        # Second loading animation step
+        loading_step_2 = "☐▣☐"
+        await bot.edit_message_caption(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            caption=loading_step_2
         )
 
-        # Acknowledge the callback query immediately to prevent timeout
-        await bot.answer_callback_query(callback_query.id)
+        # Wait for 1 second
+        await asyncio.sleep(1)
 
-        # Simulate loading delay
-        await asyncio.sleep(3)
+        # Third loading animation step
+        loading_step_3 = "☐☐▣"
+        await bot.edit_message_caption(
+            chat_id=callback_query.message.chat.id,
+            message_id=callback_query.message.message_id,
+            caption=loading_step_3
+        )
 
-        # Edit the message with the details
+        # Wait for 1 second before showing the final about me text
+        await asyncio.sleep(1)
+
+        # Final About Me details
         bot_username = (await bot.me).username
         about_me_caption = f"""<b><blockquote>⍟───[ MY ᴅᴇᴛᴀɪʟꜱ ]───⍟</blockquote>
         
@@ -93,7 +114,7 @@ async def show_about_me(callback_query: types.CallbackQuery):
 ‣ ʙᴏᴛ sᴇʀᴠᴇʀ : <a href='https://render.com'>Rᴇɴᴅᴇʀ</a>
 ‣ ʙᴜɪʟᴅ sᴛᴀᴛᴜs : ᴠ2.7.1 [sᴛᴀʙʟᴇ]</b>"""
 
-        # Update the caption with details
+        # Update the caption with the final about me details
         await bot.edit_message_caption(
             chat_id=callback_query.message.chat.id,
             message_id=callback_query.message.message_id,
@@ -103,8 +124,6 @@ async def show_about_me(callback_query: types.CallbackQuery):
 
     except Exception as e:
         print(f"Error handling about_me callback: {e}")
-        # Handle errors by sending a message or logging
-
         # Optionally, send a message if something went wrong
         await bot.send_message(
             chat_id=callback_query.message.chat.id,
