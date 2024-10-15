@@ -50,7 +50,7 @@ Wᴀɴᴛ ᴛᴏ ᴡᴀᴛᴄʜ Aɴɪᴍᴇ? I ᴄᴀɴ ᴘʀᴏᴠɪᴅᴇ ᴀ�
     keyboard.add(button)
 
     # Send the image with the caption and the button
-    image_url = "https://files.catbox.moe/w34293.jpg"
+    image_url = "https://files.catbox.moe/ido2f5.jpg"
     await bot.send_photo(
         chat_id=message.chat.id,
         photo=image_url,
