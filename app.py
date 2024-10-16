@@ -175,8 +175,9 @@ async def back_to_start(callback_query: types.CallbackQuery):
         # Wait for 1 second before going back to the start message
         await asyncio.sleep(1)
 
-        # Send the start message again
-        await start_command(callback_query.message)  # Call the start command to resend the initial message
+        # Call the start command to resend the initial message
+        message = callback_query.message  # Get the message to pass to the start command
+        await start_command(message)  # Correctly call the start command
 
     except Exception as e:
         print(f"Error handling back_to_start callback: {e}")
