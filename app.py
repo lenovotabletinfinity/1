@@ -176,8 +176,7 @@ async def back_to_start(callback_query: types.CallbackQuery):
         await asyncio.sleep(1)
 
         # Call the start command to resend the initial message
-        message = callback_query.message  # Get the message to pass to the start command
-        await start_command(message)  # Correctly call the start command
+        await start_command(callback_query.message)  # Correctly call the start command
 
     except Exception as e:
         print(f"Error handling back_to_start callback: {e}")
@@ -215,4 +214,3 @@ if __name__ == '__main__':
     else:
         from aiogram import executor
         executor.start_polling(dp, skip_updates=True)
-    
